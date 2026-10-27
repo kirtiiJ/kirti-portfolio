@@ -1,4 +1,5 @@
 const paths = {
+  spotify: '<circle cx="12" cy="12" r="10" fill="currentColor" stroke="none"/><path d="M6.4 9.1c3.7-1.1 7.7-.8 11.2 1M7.2 12.3c3.1-.9 6.5-.6 9.5.9M8 15.4c2.6-.7 5.3-.5 7.8.8" stroke="#122019" stroke-width="1.5" fill="none"/>',
   music: '<path d="M9 18V5l12-2v13M9 9l12-2"/><ellipse cx="6" cy="18" rx="3" ry="3"/><ellipse cx="18" cy="16" rx="3" ry="3"/>',
   desktop: '<rect x="2" y="3" width="20" height="14" rx="3"/><path d="M8 21h8m-4-4v4M5 6h4v4H5z"/>',
   person: '<circle cx="12" cy="8" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>',

@@ -8,10 +8,10 @@ export const profile = {
   fullName: 'Kirti Joshi',
   role: 'Senior Software Engineer',
   portrait: 'assets/kirti-photo.webp',
-  email: 'kirti@example.com',
-  linkedin: 'https://example.com/kirti/linkedin',
-  github: 'https://example.com/kirti/github',
-  contactIsDemo: true,
+  email: 'kirtijoshi2608@gmail.com',
+  linkedin: 'https://www.linkedin.com/in/kirti-joshi2608',
+  github: 'https://github.com/kirtiiJ',
+  contactIsDemo: false,
   experience: '8+',
 };
 

@@ -14,7 +14,7 @@ import { desktopFolders, personalFolderView, personalDetail, snapshotView } from
 import { FolderLayout } from './folder-layout.js';
 import { WidgetLayout } from './widget-layout.js';
 import { readingView, readingDetail, destinationMap, savePlant, addGrowthPhoto } from './reading.js';
-import { Soundtrack } from './soundtrack.js';
+import { Soundtrack, soundtrackDockButton } from './soundtrack.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -54,6 +54,12 @@ function setTheme(theme, persist = true) {
     button.style.setProperty('--preview-panel', variant.panel);
   });
   $$('button[data-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === currentMode)));
+  $$('[data-action="toggle-theme"]').forEach(button => {
+    const dark = currentMode === 'dark';
+    button.innerHTML = icon(dark ? 'sun' : 'moon');
+    button.setAttribute('aria-checked', String(dark));
+    button.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+  });
   $('meta[name="theme-color"]').content = themes[theme][currentMode].wallpaper;
   if (persist) { savePreference('theme', theme); savePreference('mode', currentMode); }
 }
@@ -104,6 +110,7 @@ function initializeChrome() {
   const dockClasses = ['finder', 'case', 'grid', 'code', 'mail'];
   $('#dock-apps').innerHTML = navigation.map((item, index) => `<button class="dock-item" data-nav="${item.id}" aria-label="${item.label}" data-tooltip="${item.label}"><span class="dock-icon dock-${dockClasses[index]}">${index === 0 ? finder : icon(item.icon)}</span><span class="dock-active"></span></button>`).join('');
   $('.dock-resume').innerHTML = icon('file');
+  $('#dock-apps').insertAdjacentHTML('beforeend', soundtrackDockButton());
   $('.dock-settings').innerHTML = icon('settings');
   updateSoundControls();
 }
@@ -125,7 +132,7 @@ function moveLens() {
 }
 
 initializeChrome();
-new Soundtrack($('#soundtrack'));
+new Soundtrack($('#soundtrack'), $('#dock-spotify'));
 const folderLayout = new FolderLayout($('#desktop-folders'), { obstacles: () => [$('#profile-widget').getBoundingClientRect()] });
 new WidgetLayout($('#desktop-widgets'), { obstacles: () => $$('.desktop-folder').map(button => button.getBoundingClientRect()) });
 new DockMagnifier($('#dock'));
@@ -153,10 +160,21 @@ async function navigate(id, updateHistory = true, animate = true) {
   await desktop.open(id, { animate });
 }
 
+function prepareDialogScroll(dialog) {
+  const close = dialog.querySelector(':scope > .dialog-close');
+  if (!close || dialog.querySelector(':scope > .dialog-scroll')) return;
+  const scroll = document.createElement('div');
+  scroll.className = 'dialog-scroll';
+  scroll.tabIndex = -1;
+  [...dialog.childNodes].filter(node => node !== close).forEach(node => scroll.append(node));
+  dialog.append(scroll);
+}
+
 function showDialog(id) {
   closeMenus();
   $$('dialog[open]').forEach(dialog => dialog.close());
   const dialog = $(`#${id}`);
+  prepareDialogScroll(dialog);
   dialog.showModal();
   if (id === 'spotlight') {
     $('#spotlight-input').value = '';
@@ -238,6 +256,7 @@ function openReadingDetail(key, show = true) {
   dialog.dataset.activeReadingDetail = key;
   dialog.innerHTML = content;
   dialog.setAttribute('aria-labelledby', 'reading-detail-title');
+  prepareDialogScroll(dialog);
   if (show) showDialog('personal-dialog');
 }
 
@@ -278,6 +297,7 @@ async function uploadGrowthPhoto(input) {
 
 
 const actions = {
+  'toggle-theme': () => setMode(currentMode === 'dark' ? 'light' : 'dark'),
   home: () => navigate('about'),
   download: downloadResume,
   search: () => showDialog('spotlight'),
